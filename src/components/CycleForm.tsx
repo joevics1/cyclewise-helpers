@@ -7,7 +7,21 @@ import CycleLengthSelector from "./cycle/CycleLengthSelector";
 import ResultsDialog from "./cycle/ResultsDialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bell } from "lucide-react";
+import { Bell, CalendarDays } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface NotificationPreferences {
+  beforePeriod: boolean;
+  onPeriodStart: boolean;
+  ovulation: boolean;
+  reminderDays: string;
+}
 
 const CycleForm = () => {
   const [lastPeriod, setLastPeriod] = useState<Date>();
@@ -15,6 +29,12 @@ const CycleForm = () => {
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>({
+    beforePeriod: true,
+    onPeriodStart: true,
+    ovulation: false,
+    reminderDays: "7",
+  });
   const { toast } = useToast();
 
   // Load saved data from localStorage
@@ -25,6 +45,7 @@ const CycleForm = () => {
       if (parsed.lastPeriod) setLastPeriod(new Date(parsed.lastPeriod));
       if (parsed.cycleLength) setCycleLength(parsed.cycleLength);
       if (parsed.notificationsEnabled) setNotificationsEnabled(parsed.notificationsEnabled);
+      if (parsed.notificationPrefs) setNotificationPrefs(parsed.notificationPrefs);
     }
   }, []);
 
@@ -34,10 +55,11 @@ const CycleForm = () => {
       localStorage.setItem('cycleData', JSON.stringify({
         lastPeriod,
         cycleLength,
-        notificationsEnabled
+        notificationsEnabled,
+        notificationPrefs
       }));
     }
-  }, [lastPeriod, cycleLength, notificationsEnabled]);
+  }, [lastPeriod, cycleLength, notificationsEnabled, notificationPrefs]);
 
   const calculateDates = () => {
     if (!lastPeriod) {
@@ -66,13 +88,13 @@ const CycleForm = () => {
 
     // Schedule notifications if enabled
     if (notificationsEnabled && "Notification" in window) {
-      scheduleNotifications(nextPeriod);
+      scheduleNotifications(nextPeriod, ovulationDay);
     }
 
     setShowResults(true);
   };
 
-  const scheduleNotifications = async (nextPeriod: Date) => {
+  const scheduleNotifications = async (nextPeriod: Date, ovulationDay: Date) => {
     if (Notification.permission !== "granted") {
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
@@ -85,25 +107,37 @@ const CycleForm = () => {
       }
     }
 
-    // Schedule notification for 7 days before
-    const sevenDaysBefore = subDays(nextPeriod, 7);
-    if (sevenDaysBefore > new Date()) {
-      setTimeout(() => {
-        new Notification("Period Reminder", {
-          body: "Your period is expected in 7 days. Prepare accordingly!",
-          icon: "/favicon.ico"
-        });
-      }, sevenDaysBefore.getTime() - new Date().getTime());
+    // Schedule notification for days before period
+    if (notificationPrefs.beforePeriod) {
+      const daysBefore = subDays(nextPeriod, parseInt(notificationPrefs.reminderDays));
+      if (daysBefore > new Date()) {
+        setTimeout(() => {
+          new Notification("Period Reminder", {
+            body: `Your period is expected in ${notificationPrefs.reminderDays} days. Prepare accordingly!`,
+            icon: "/favicon.ico"
+          });
+        }, daysBefore.getTime() - new Date().getTime());
+      }
     }
 
-    // Schedule notification for the start day
-    if (nextPeriod > new Date()) {
+    // Schedule notification for period start
+    if (notificationPrefs.onPeriodStart && nextPeriod > new Date()) {
       setTimeout(() => {
         new Notification("Period Start", {
           body: "Your period starts today. Stay prepared!",
           icon: "/favicon.ico"
         });
       }, nextPeriod.getTime() - new Date().getTime());
+    }
+
+    // Schedule notification for ovulation
+    if (notificationPrefs.ovulation && ovulationDay > new Date()) {
+      setTimeout(() => {
+        new Notification("Ovulation Day", {
+          body: "Your ovulation is expected today. This is your most fertile day.",
+          icon: "/favicon.ico"
+        });
+      }, ovulationDay.getTime() - new Date().getTime());
     }
   };
 
@@ -143,14 +177,71 @@ const CycleForm = () => {
 
       <CycleLengthSelector cycleLength={cycleLength} setCycleLength={setCycleLength} />
 
-      <div className="flex items-center space-x-2 bg-[#FFE5EC] p-4 rounded-lg">
-        <Bell className="w-5 h-5 text-[#FF69B4]" />
-        <Label htmlFor="notifications" className="flex-1">Enable notifications</Label>
-        <Switch
-          id="notifications"
-          checked={notificationsEnabled}
-          onCheckedChange={handleNotificationToggle}
-        />
+      <div className="space-y-4 bg-[#FFE5EC] p-4 rounded-lg">
+        <div className="flex items-center space-x-2">
+          <Bell className="w-5 h-5 text-[#FF69B4]" />
+          <Label htmlFor="notifications" className="flex-1">Enable notifications</Label>
+          <Switch
+            id="notifications"
+            checked={notificationsEnabled}
+            onCheckedChange={handleNotificationToggle}
+          />
+        </div>
+
+        {notificationsEnabled && (
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="beforePeriod"
+                checked={notificationPrefs.beforePeriod}
+                onCheckedChange={(checked) => 
+                  setNotificationPrefs(prev => ({ ...prev, beforePeriod: checked }))
+                }
+              />
+              <Label htmlFor="beforePeriod">Notify before period</Label>
+            </div>
+
+            {notificationPrefs.beforePeriod && (
+              <Select
+                value={notificationPrefs.reminderDays}
+                onValueChange={(value) => 
+                  setNotificationPrefs(prev => ({ ...prev, reminderDays: value }))
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select days before" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="3">3 days before</SelectItem>
+                  <SelectItem value="5">5 days before</SelectItem>
+                  <SelectItem value="7">7 days before</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="periodStart"
+                checked={notificationPrefs.onPeriodStart}
+                onCheckedChange={(checked) => 
+                  setNotificationPrefs(prev => ({ ...prev, onPeriodStart: checked }))
+                }
+              />
+              <Label htmlFor="periodStart">Notify on period start</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="ovulation"
+                checked={notificationPrefs.ovulation}
+                onCheckedChange={(checked) => 
+                  setNotificationPrefs(prev => ({ ...prev, ovulation: checked }))
+                }
+              />
+              <Label htmlFor="ovulation">Notify on ovulation day</Label>
+            </div>
+          </div>
+        )}
       </div>
 
       <Button 

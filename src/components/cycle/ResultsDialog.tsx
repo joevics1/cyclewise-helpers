@@ -26,68 +26,66 @@ const ResultsDialog = ({ open, onOpenChange, results }: ResultsDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl h-[90vh] p-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6">
+      <DialogContent className="max-w-full sm:max-w-2xl h-[100dvh] p-0 overflow-hidden">
+        <DialogHeader className="px-6 pt-6 sticky top-0 bg-white z-10">
           <DialogTitle className="text-2xl font-bold text-center mb-4">
             Your Cycle Predictions
           </DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-full px-6 pb-6">
-          <div className="space-y-4">
-            <div className="grid gap-4">
-              {/* Next Period */}
-              <div className="bg-[#FFE5EC] p-4 rounded-lg">
-                <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                  <Info className="w-5 h-5 text-[#FF69B4]" />
-                  Next Period
-                </h3>
-                <p className="text-lg mt-2">{format(results.nextPeriod, "MMMM d, yyyy")}</p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Your next menstrual cycle is expected to begin on this date. Plan accordingly.
-                </p>
-              </div>
+        <ScrollArea className="h-[calc(100dvh-8rem)] px-6">
+          <div className="space-y-4 pb-6">
+            {/* Next Period */}
+            <div className="bg-[#FFE5EC] p-4 rounded-lg">
+              <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
+                <Info className="w-5 h-5 text-[#FF69B4]" />
+                Next Period
+              </h3>
+              <p className="text-lg mt-2">{format(results.nextPeriod, "MMMM d, yyyy")}</p>
+              <p className="text-sm text-gray-600 mt-1">
+                Your next menstrual cycle is expected to begin on this date. Plan accordingly.
+              </p>
+            </div>
 
-              {/* Ovulation Window */}
-              <div className="bg-[#E5DEFF] p-4 rounded-lg">
-                <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                  <Info className="w-5 h-5 text-[#9B87F5]" />
-                  Ovulation Window
-                </h3>
-                <p className="text-lg mt-2">
-                  {format(results.ovulationDay, "MMMM d")} - {format(results.fertileWindowEnd, "MMMM d, yyyy")}
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  This is your estimated ovulation period. Your egg is released during this time, making it the peak fertility window.
-                </p>
-              </div>
+            {/* Ovulation Window */}
+            <div className="bg-[#E5DEFF] p-4 rounded-lg">
+              <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
+                <Info className="w-5 h-5 text-[#9B87F5]" />
+                Ovulation Window
+              </h3>
+              <p className="text-lg mt-2">
+                {format(results.ovulationDay, "MMMM d")} - {format(results.fertileWindowEnd, "MMMM d, yyyy")}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                This is your estimated ovulation period. Your egg is released during this time, making it the peak fertility window.
+              </p>
+            </div>
 
-              {/* Fertile Window */}
-              <div className="bg-[#FDE1D3] p-4 rounded-lg">
-                <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                  <Info className="w-5 h-5 text-[#FF8C5A]" />
-                  Fertile Window
-                </h3>
-                <p className="text-lg mt-2">
-                  {format(results.fertileWindowStart, "MMMM d")} - {format(results.fertileWindowEnd, "MMMM d, yyyy")}
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  During this window, you have the highest chance of conception. The days leading up to and including ovulation are your most fertile days.
-                </p>
-              </div>
+            {/* Fertile Window */}
+            <div className="bg-[#FDE1D3] p-4 rounded-lg">
+              <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
+                <Info className="w-5 h-5 text-[#FF8C5A]" />
+                Fertile Window
+              </h3>
+              <p className="text-lg mt-2">
+                {format(results.fertileWindowStart, "MMMM d")} - {format(results.fertileWindowEnd, "MMMM d, yyyy")}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                During this window, you have the highest chance of conception. The days leading up to and including ovulation are your most fertile days.
+              </p>
+            </div>
 
-              {/* Less Fertile Phase */}
-              <div className="bg-[#D3E4FD] p-4 rounded-lg">
-                <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                  <Info className="w-5 h-5 text-[#5A9EFF]" />
-                  Less Fertile Phase
-                </h3>
-                <p className="text-lg mt-2">
-                  {format(results.follicularPhaseStart, "MMMM d")} - {format(results.follicularPhaseEnd, "MMMM d, yyyy")}
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  This is your less fertile phase, occurring after your period and before your fertile window. While pregnancy is still possible, it's less likely during this time.
-                </p>
-              </div>
+            {/* Less Fertile Phase */}
+            <div className="bg-[#D3E4FD] p-4 rounded-lg">
+              <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
+                <Info className="w-5 h-5 text-[#5A9EFF]" />
+                Less Fertile Phase
+              </h3>
+              <p className="text-lg mt-2">
+                {format(results.follicularPhaseStart, "MMMM d")} - {format(results.follicularPhaseEnd, "MMMM d, yyyy")}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                This is your less fertile phase, occurring after your period and before your fertile window. While pregnancy is still possible, it's less likely during this time.
+              </p>
             </div>
 
             <Accordion type="single" collapsible className="w-full">
@@ -110,15 +108,16 @@ const ResultsDialog = ({ open, onOpenChange, results }: ResultsDialogProps) => {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-
-            <Button 
-              onClick={() => onOpenChange(false)}
-              className="w-full bg-[#FF69B4] hover:bg-[#FF69B4]/90 text-white mt-4"
-            >
-              Close
-            </Button>
           </div>
         </ScrollArea>
+        <div className="p-6 sticky bottom-0 bg-white border-t">
+          <Button 
+            onClick={() => onOpenChange(false)}
+            className="w-full bg-[#FF69B4] hover:bg-[#FF69B4]/90 text-white"
+          >
+            Close
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
