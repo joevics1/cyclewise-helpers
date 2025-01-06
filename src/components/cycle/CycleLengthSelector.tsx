@@ -25,8 +25,8 @@ const CycleLengthSelector = ({ cycleLength, setCycleLength }: CycleLengthSelecto
             onClick={() => setCycleLength(days.toString())}
             className={`min-w-[60px] snap-center ${
               cycleLength === days.toString()
-                ? "bg-cycle-accent text-white hover:bg-cycle-accent/90"
-                : "bg-cycle-purple hover:bg-cycle-accent/10"
+                ? "bg-[#FF69B4] text-white hover:bg-[#FF69B4]/90"
+                : "bg-[#FFE5EC] hover:bg-[#FFE5EC]/90 text-[#FF69B4]"
             }`}
           >
             {days}

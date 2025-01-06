@@ -36,9 +36,9 @@ const ResultsDialog = ({ open, onOpenChange, results }: ResultsDialogProps) => {
           <div className="space-y-4">
             <div className="grid gap-4">
               {/* Next Period */}
-              <div className="bg-[#E5DEFF] p-4 rounded-lg">
+              <div className="bg-[#FFE5EC] p-4 rounded-lg">
                 <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                  <Info className="w-5 h-5 text-cycle-accent" />
+                  <Info className="w-5 h-5 text-[#FF69B4]" />
                   Next Period
                 </h3>
                 <p className="text-lg mt-2">{format(results.nextPeriod, "MMMM d, yyyy")}</p>
@@ -48,23 +48,23 @@ const ResultsDialog = ({ open, onOpenChange, results }: ResultsDialogProps) => {
               </div>
 
               {/* Ovulation Window */}
-              <div className="bg-[#FFDEE2] p-4 rounded-lg">
+              <div className="bg-[#E5DEFF] p-4 rounded-lg">
                 <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                  <Info className="w-5 h-5 text-cycle-accent" />
+                  <Info className="w-5 h-5 text-[#9B87F5]" />
                   Ovulation Window
                 </h3>
                 <p className="text-lg mt-2">
                   {format(results.ovulationDay, "MMMM d")} - {format(results.fertileWindowEnd, "MMMM d, yyyy")}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">
-                  This is your estimated ovulation period. You're most fertile during these days.
+                  This is your estimated ovulation period. Your egg is released during this time, making it the peak fertility window.
                 </p>
               </div>
 
               {/* Fertile Window */}
               <div className="bg-[#FDE1D3] p-4 rounded-lg">
                 <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                  <Info className="w-5 h-5 text-cycle-accent" />
+                  <Info className="w-5 h-5 text-[#FF8C5A]" />
                   Fertile Window
                 </h3>
                 <p className="text-lg mt-2">
@@ -78,7 +78,7 @@ const ResultsDialog = ({ open, onOpenChange, results }: ResultsDialogProps) => {
               {/* Less Fertile Phase */}
               <div className="bg-[#D3E4FD] p-4 rounded-lg">
                 <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                  <Info className="w-5 h-5 text-cycle-accent" />
+                  <Info className="w-5 h-5 text-[#5A9EFF]" />
                   Less Fertile Phase
                 </h3>
                 <p className="text-lg mt-2">
@@ -91,8 +91,8 @@ const ResultsDialog = ({ open, onOpenChange, results }: ResultsDialogProps) => {
             </div>
 
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="disclaimer">
-                <AccordionTrigger className="text-sm font-semibold text-gray-700">
+              <AccordionItem value="disclaimer" className="border-b-0">
+                <AccordionTrigger className="text-sm font-semibold text-gray-700 hover:no-underline">
                   Important Disclaimer
                 </AccordionTrigger>
                 <AccordionContent>
@@ -113,7 +113,7 @@ const ResultsDialog = ({ open, onOpenChange, results }: ResultsDialogProps) => {
 
             <Button 
               onClick={() => onOpenChange(false)}
-              className="w-full bg-cycle-accent hover:bg-cycle-accent/90 text-white mt-4"
+              className="w-full bg-[#FF69B4] hover:bg-[#FF69B4]/90 text-white mt-4"
             >
               Close
             </Button>
