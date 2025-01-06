@@ -25,7 +25,7 @@ interface NotificationPreferences {
 
 const CycleForm = () => {
   const [lastPeriod, setLastPeriod] = useState<Date>();
-  const [cycleLength, setCycleLength] = useState("28");
+  const [cycleLength, setCycleLength] = useState("31"); // Changed default to 31
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -37,7 +37,6 @@ const CycleForm = () => {
   });
   const { toast } = useToast();
 
-  // Load saved data from localStorage
   useEffect(() => {
     const savedData = localStorage.getItem('cycleData');
     if (savedData) {
