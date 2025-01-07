@@ -1,5 +1,7 @@
 import CycleForm from "@/components/CycleForm";
 import MoodTracker from "@/components/mood/MoodTracker";
+import SymptomLogger from "@/components/cycle/SymptomLogger";
+import PhaseInsights from "@/components/cycle/PhaseInsights";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
@@ -10,15 +12,23 @@ const Index = () => {
           Menstrual Cycle Tracker
         </h1>
         <Tabs defaultValue="cycle" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsList className="grid w-full grid-cols-4 mb-4">
             <TabsTrigger value="cycle">Cycle Tracker</TabsTrigger>
             <TabsTrigger value="mood">Mood Tracker</TabsTrigger>
+            <TabsTrigger value="symptoms">Symptoms</TabsTrigger>
+            <TabsTrigger value="insights">Phase Insights</TabsTrigger>
           </TabsList>
           <TabsContent value="cycle">
             <CycleForm />
           </TabsContent>
           <TabsContent value="mood">
             <MoodTracker />
+          </TabsContent>
+          <TabsContent value="symptoms">
+            <SymptomLogger />
+          </TabsContent>
+          <TabsContent value="insights">
+            <PhaseInsights />
           </TabsContent>
         </Tabs>
       </div>
