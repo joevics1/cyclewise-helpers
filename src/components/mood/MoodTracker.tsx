@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Smile, Frown, Meh, Heart, HeartCrack } from "lucide-react";
+import { 
+  Smile, Frown, Meh, Heart, HeartCrack, 
+  PartyPopper, Coffee, Cloud, Sun, Moon 
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,24 +11,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { format, subDays, isSameDay, startOfMonth, endOfMonth } from 'date-fns';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, 
+  Tooltip, ResponsiveContainer 
+} from 'recharts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface MoodEntry {
   date: Date;
   mood: string;
-  notes?: string;
+  timestamp: number;
 }
 
 const moods = [
-  { icon: Smile, label: 'Happy', color: 'text-green-500' },
-  { icon: Heart, label: 'Loved', color: 'text-pink-500' },
-  { icon: Meh, label: 'Neutral', color: 'text-yellow-500' },
-  { icon: Frown, label: 'Sad', color: 'text-blue-500' },
-  { icon: HeartCrack, label: 'Stressed', color: 'text-red-500' },
+  { icon: PartyPopper, label: 'Excited', color: 'text-purple-500', value: 5 },
+  { icon: Heart, label: 'Happy', color: 'text-pink-500', value: 4 },
+  { icon: Sun, label: 'Content', color: 'text-yellow-500', value: 3 },
+  { icon: Cloud, label: 'Meh', color: 'text-gray-500', value: 2 },
+  { icon: Frown, label: 'Sad', color: 'text-blue-500', value: 1 },
+  { icon: HeartCrack, label: 'Stressed', color: 'text-red-500', value: 0 },
 ];
 
 const MoodTracker = () => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]);
+  const [selectedPeriod, setSelectedPeriod] = useState<'day' | 'week' | 'month'>('day');
 
   useEffect(() => {
     const savedMoods = localStorage.getItem('moodEntries');
@@ -40,55 +49,86 @@ const MoodTracker = () => {
 
   const saveMoodEntry = (mood: string) => {
     const newEntry: MoodEntry = {
-      date: selectedDate,
-      mood: mood
+      date: new Date(),
+      mood: mood,
+      timestamp: Date.now()
     };
 
-    const updatedEntries = [...moodEntries.filter(entry => 
-      entry.date.toDateString() !== selectedDate.toDateString()
-    ), newEntry];
-
+    const updatedEntries = [...moodEntries, newEntry];
     setMoodEntries(updatedEntries);
     localStorage.setItem('moodEntries', JSON.stringify(updatedEntries));
   };
 
-  const getMoodForDate = (date: Date) => {
+  const getTodaysMood = () => {
     return moodEntries.find(entry => 
-      entry.date.toDateString() === date.toDateString()
+      isSameDay(new Date(entry.date), new Date())
     )?.mood;
   };
 
+  const getMoodStats = () => {
+    const today = new Date();
+    const lastWeek = subDays(today, 7);
+    const monthStart = startOfMonth(today);
+    const monthEnd = endOfMonth(today);
+
+    const monthlyData = moods.map(mood => ({
+      name: mood.label,
+      count: moodEntries.filter(entry => 
+        entry.date >= monthStart && 
+        entry.date <= monthEnd && 
+        entry.mood === mood.label
+      ).length
+    }));
+
+    return monthlyData;
+  };
+
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>Mood Tracker</CardTitle>
-        <CardDescription>Track your daily mood and emotional well-being</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={(date) => date && setSelectedDate(date)}
-          className="rounded-md border"
-        />
-        
-        <div className="grid grid-cols-3 gap-2">
-          {moods.map(({ icon: Icon, label, color }) => (
-            <Button
-              key={label}
-              variant="outline"
-              className={`flex flex-col items-center p-4 ${
-                getMoodForDate(selectedDate) === label ? 'ring-2 ring-pink-500' : ''
-              }`}
-              onClick={() => saveMoodEntry(label)}
-            >
-              <Icon className={`h-6 w-6 ${color}`} />
-              <span className="mt-1 text-sm">{label}</span>
-            </Button>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>How are you feeling today?</CardTitle>
+          <CardDescription>Select your current mood</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {moods.map(({ icon: Icon, label, color }) => (
+              <Button
+                key={label}
+                variant="outline"
+                className={`flex flex-col items-center p-4 h-auto ${
+                  getTodaysMood() === label ? 'ring-2 ring-pink-500' : ''
+                }`}
+                onClick={() => saveMoodEntry(label)}
+              >
+                <Icon className={`h-8 w-8 ${color}`} />
+                <span className="mt-2 text-sm">{label}</span>
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Mood Analysis</CardTitle>
+          <CardDescription>Track your emotional patterns</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={getMoodStats()}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill="#8884d8" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

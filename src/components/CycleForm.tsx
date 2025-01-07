@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Move interfaces to separate types file
 interface NotificationPreferences {
   beforePeriod: boolean;
   onPeriodStart: boolean;
@@ -25,7 +26,7 @@ interface NotificationPreferences {
 
 const CycleForm = () => {
   const [lastPeriod, setLastPeriod] = useState<Date>();
-  const [cycleLength, setCycleLength] = useState("31"); // Changed default to 31
+  const [cycleLength, setCycleLength] = useState("31");
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
@@ -170,7 +171,8 @@ const CycleForm = () => {
           mode="single"
           selected={lastPeriod}
           onSelect={setLastPeriod}
-          className="rounded-lg border shadow bg-[#F1F0FB] max-h-[300px]"
+          disabled={(date) => date > new Date() || date < subDays(new Date(), 90)}
+          className="rounded-lg border shadow bg-[#F1F0FB] w-full"
         />
       </div>
 
