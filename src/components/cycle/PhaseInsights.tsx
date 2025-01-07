@@ -2,12 +2,11 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
-  Drop, 
+  Heart, 
   Flower2, 
   Moon, 
   Sun, 
   Thermometer,
-  Heart,
   Brain,
   Battery,
   Apple,
@@ -27,7 +26,7 @@ interface PhaseInfo {
 const phaseInsights: Record<string, PhaseInfo> = {
   menstrual: {
     title: "Menstrual Phase",
-    icon: <Drop className="w-6 h-6 text-red-500" />,
+    icon: <Heart className="w-6 h-6 text-red-500" />,
     description: "Your body is shedding the uterine lining. Energy levels may be lower, and it's important to rest and take care of yourself.",
     symptoms: [
       "Cramping",
