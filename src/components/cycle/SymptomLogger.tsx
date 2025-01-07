@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import {
@@ -14,50 +13,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-interface Symptom {
-  id: string;
-  name: string;
-  category: "physical" | "emotional" | "other" | "pregnancy";
-}
-
-const symptoms: Symptom[] = [
-  // Physical Symptoms
-  { id: "cramps", name: "Cramps", category: "physical" },
-  { id: "headache", name: "Headache", category: "physical" },
-  { id: "bloating", name: "Bloating", category: "physical" },
-  { id: "fatigue", name: "Fatigue", category: "physical" },
-  { id: "breast_tenderness", name: "Breast Tenderness", category: "physical" },
-  { id: "acne", name: "Acne", category: "physical" },
-  { id: "backache", name: "Backache", category: "physical" },
-  { id: "nausea", name: "Nausea", category: "physical" },
-  { id: "dizziness", name: "Dizziness", category: "physical" },
-  { id: "constipation", name: "Constipation", category: "physical" },
-  { id: "diarrhea", name: "Diarrhea", category: "physical" },
-  
-  // Emotional Symptoms
-  { id: "anxiety", name: "Anxiety", category: "emotional" },
-  { id: "mood_swings", name: "Mood Swings", category: "emotional" },
-  { id: "irritability", name: "Irritability", category: "emotional" },
-  { id: "depression", name: "Depression", category: "emotional" },
-  { id: "crying_spells", name: "Crying Spells", category: "emotional" },
-  
-  // Other Symptoms
-  { id: "insomnia", name: "Insomnia", category: "other" },
-  { id: "food_cravings", name: "Food Cravings", category: "other" },
-  { id: "appetite_changes", name: "Appetite Changes", category: "other" },
-  { id: "hot_flashes", name: "Hot Flashes", category: "other" },
-  
-  // Pregnancy-Related Symptoms
-  { id: "missed_period", name: "Missed Period", category: "pregnancy" },
-  { id: "morning_sickness", name: "Morning Sickness", category: "pregnancy" },
-  { id: "frequent_urination", name: "Frequent Urination", category: "pregnancy" },
-  { id: "food_aversions", name: "Food Aversions", category: "pregnancy" },
-  { id: "metallic_taste", name: "Metallic Taste", category: "pregnancy" },
-  { id: "heightened_smell", name: "Heightened Sense of Smell", category: "pregnancy" },
-  { id: "light_spotting", name: "Light Spotting", category: "pregnancy" },
-  { id: "breast_changes", name: "Breast Changes", category: "pregnancy" },
-];
+import { symptoms } from "@/types/symptoms";
+import SymptomSection from "./SymptomSection";
+import SymptomHistory from "./SymptomHistory";
 
 const SymptomLogger = () => {
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
@@ -83,9 +41,9 @@ const SymptomLogger = () => {
     );
   };
 
-  const checkPregnancySymptoms = (symptoms: string[]) => {
-    const pregnancySymptoms = symptoms.filter(
-      id => symptoms.find(s => s === id)?.category === "pregnancy"
+  const checkPregnancySymptoms = (selectedSymptomIds: string[]) => {
+    const pregnancySymptoms = selectedSymptomIds.filter(id => 
+      symptoms.find(s => s.id === id)?.category === "pregnancy"
     );
     return pregnancySymptoms.length >= 4;
   };
@@ -121,26 +79,6 @@ const SymptomLogger = () => {
     setSelectedSymptoms([]);
   };
 
-  const renderSymptomSection = (category: "physical" | "emotional" | "other" | "pregnancy", title: string) => (
-    <div>
-      <h3 className="text-lg font-medium mb-2">{title}</h3>
-      <div className="flex flex-wrap gap-2">
-        {symptoms
-          .filter(s => s.category === category)
-          .map(symptom => (
-            <Badge
-              key={symptom.id}
-              variant={selectedSymptoms.includes(symptom.id) ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => toggleSymptom(symptom.id)}
-            >
-              {symptom.name}
-            </Badge>
-          ))}
-      </div>
-    </div>
-  );
-
   return (
     <div className="space-y-6">
       <Card>
@@ -149,10 +87,34 @@ const SymptomLogger = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {renderSymptomSection("physical", "Physical Symptoms")}
-            {renderSymptomSection("emotional", "Emotional Symptoms")}
-            {renderSymptomSection("other", "Other Symptoms")}
-            {renderSymptomSection("pregnancy", "Additional Symptoms")}
+            <SymptomSection
+              category="physical"
+              title="Physical Symptoms"
+              symptoms={symptoms}
+              selectedSymptoms={selectedSymptoms}
+              onToggleSymptom={toggleSymptom}
+            />
+            <SymptomSection
+              category="emotional"
+              title="Emotional Symptoms"
+              symptoms={symptoms}
+              selectedSymptoms={selectedSymptoms}
+              onToggleSymptom={toggleSymptom}
+            />
+            <SymptomSection
+              category="other"
+              title="Other Symptoms"
+              symptoms={symptoms}
+              selectedSymptoms={selectedSymptoms}
+              onToggleSymptom={toggleSymptom}
+            />
+            <SymptomSection
+              category="pregnancy"
+              title="Additional Symptoms"
+              symptoms={symptoms}
+              selectedSymptoms={selectedSymptoms}
+              onToggleSymptom={toggleSymptom}
+            />
             
             <Button 
               onClick={logSymptoms}
@@ -164,29 +126,7 @@ const SymptomLogger = () => {
         </CardContent>
       </Card>
 
-      {symptomHistory.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Symptoms</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {symptomHistory.slice(-5).reverse().map((entry, index) => (
-                <div key={index} className="border-b pb-2 last:border-0">
-                  <p className="font-medium">{format(new Date(entry.date), "PPP")}</p>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {entry.symptoms.map(symptomId => (
-                      <Badge key={symptomId} variant="secondary">
-                        {symptoms.find(s => s.id === symptomId)?.name}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <SymptomHistory history={symptomHistory} />
 
       <AlertDialog open={showPregnancyDialog} onOpenChange={setShowPregnancyDialog}>
         <AlertDialogContent>
