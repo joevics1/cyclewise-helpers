@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Heart, 
@@ -7,8 +7,6 @@ import {
   Moon, 
   Sun, 
   Thermometer,
-  Brain,
-  Battery,
   Apple,
   Dumbbell
 } from "lucide-react";
@@ -142,73 +140,77 @@ const phaseInsights: Record<string, PhaseInfo> = {
   }
 };
 
-const PhaseInsights = () => {
+interface PhaseInsightsProps {
+  phase: string;
+}
+
+const PhaseInsights = ({ phase }: PhaseInsightsProps) => {
+  const info = phaseInsights[phase];
+  if (!info) return null;
+
   return (
-    <ScrollArea className="h-[calc(100vh-12rem)]">
-      <div className="space-y-6 p-1">
-        {Object.entries(phaseInsights).map(([phase, info]) => (
-          <Card key={phase}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+    <ScrollArea className="h-full">
+      <div className="space-y-6 p-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
                 {info.icon}
-                {info.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <p className="text-muted-foreground">{info.description}</p>
-                
-                <div>
-                  <h4 className="font-medium flex items-center gap-2 mb-2">
-                    <Thermometer className="w-4 h-4" />
-                    Common Symptoms
-                  </h4>
-                  <ul className="list-disc pl-5 text-sm space-y-1">
-                    {info.symptoms.map((symptom, index) => (
-                      <li key={index}>{symptom}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-medium flex items-center gap-2 mb-2">
-                    <Heart className="w-4 h-4" />
-                    Self-Care Tips
-                  </h4>
-                  <ul className="list-disc pl-5 text-sm space-y-1">
-                    {info.selfCare.map((tip, index) => (
-                      <li key={index}>{tip}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-medium flex items-center gap-2 mb-2">
-                    <Apple className="w-4 h-4" />
-                    Nutrition Recommendations
-                  </h4>
-                  <ul className="list-disc pl-5 text-sm space-y-1">
-                    {info.nutrition.map((food, index) => (
-                      <li key={index}>{food}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-medium flex items-center gap-2 mb-2">
-                    <Dumbbell className="w-4 h-4" />
-                    Exercise Suggestions
-                  </h4>
-                  <ul className="list-disc pl-5 text-sm space-y-1">
-                    {info.exercise.map((exercise, index) => (
-                      <li key={index}>{exercise}</li>
-                    ))}
-                  </ul>
-                </div>
+                <h3 className="text-xl font-semibold">{info.title}</h3>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+              
+              <p className="text-muted-foreground">{info.description}</p>
+              
+              <div>
+                <h4 className="font-medium flex items-center gap-2 mb-2">
+                  <Thermometer className="w-4 h-4" />
+                  Common Symptoms
+                </h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  {info.symptoms.map((symptom, index) => (
+                    <li key={index}>{symptom}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-medium flex items-center gap-2 mb-2">
+                  <Heart className="w-4 h-4" />
+                  Self-Care Tips
+                </h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  {info.selfCare.map((tip, index) => (
+                    <li key={index}>{tip}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-medium flex items-center gap-2 mb-2">
+                  <Apple className="w-4 h-4" />
+                  Nutrition Recommendations
+                </h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  {info.nutrition.map((food, index) => (
+                    <li key={index}>{food}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-medium flex items-center gap-2 mb-2">
+                  <Dumbbell className="w-4 h-4" />
+                  Exercise Suggestions
+                </h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  {info.exercise.map((exercise, index) => (
+                    <li key={index}>{exercise}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </ScrollArea>
   );

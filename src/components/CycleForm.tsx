@@ -16,7 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Move interfaces to separate types file
 interface NotificationPreferences {
   beforePeriod: boolean;
   onPeriodStart: boolean;
@@ -163,6 +162,8 @@ const CycleForm = () => {
     }
   };
 
+  const hasStoredData = Boolean(localStorage.getItem('cycleData'));
+
   return (
     <div className="w-full max-w-md mx-auto space-y-6 animate-fade-in">
       <div className="space-y-2">
@@ -249,7 +250,7 @@ const CycleForm = () => {
         onClick={calculateDates}
         className="w-full bg-cycle-accent hover:bg-cycle-accent/90 text-white"
       >
-        Calculate Cycle
+        {hasStoredData ? 'View Insights' : 'Calculate Cycle'}
       </Button>
 
       <ResultsDialog 
