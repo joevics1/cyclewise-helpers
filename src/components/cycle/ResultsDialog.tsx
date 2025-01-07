@@ -12,7 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Info, X } from "lucide-react";
+import { Info, ChevronDown, Heart, Flower2, Moon, Sun } from "lucide-react";
 import { format } from "date-fns";
 
 interface ResultsDialogProps {
@@ -20,6 +20,140 @@ interface ResultsDialogProps {
   onOpenChange: (open: boolean) => void;
   results: any;
 }
+
+const phaseInsights = {
+  menstrual: {
+    icon: <Heart className="w-5 h-5 text-red-500" />,
+    title: "Menstrual Phase Insights",
+    description: "Your body is shedding the uterine lining. Energy levels may be lower.",
+    selfCare: [
+      "Rest and relaxation",
+      "Warm baths",
+      "Gentle stretching",
+      "Meditation"
+    ],
+    nutrition: [
+      "Iron-rich foods",
+      "Dark chocolate",
+      "Warm, comforting foods",
+      "Stay hydrated"
+    ],
+    exercise: [
+      "Light walking",
+      "Gentle yoga",
+      "Swimming",
+      "Stretching"
+    ]
+  },
+  follicular: {
+    icon: <Sun className="w-5 h-5 text-yellow-500" />,
+    title: "Follicular Phase Insights",
+    description: "Estrogen levels begin to rise. You may feel more energetic and creative.",
+    selfCare: [
+      "Start new projects",
+      "Social activities",
+      "Learning new skills",
+      "Creative pursuits"
+    ],
+    nutrition: [
+      "Lean proteins",
+      "Fresh vegetables",
+      "Fermented foods",
+      "Seeds"
+    ],
+    exercise: [
+      "High-intensity workouts",
+      "Strength training",
+      "Dance classes",
+      "Running"
+    ]
+  },
+  ovulatory: {
+    icon: <Flower2 className="w-5 h-5 text-pink-500" />,
+    title: "Ovulatory Phase Insights",
+    description: "Peak fertility period. Energy levels and confidence are typically highest.",
+    selfCare: [
+      "Social connections",
+      "Communication",
+      "Self-expression",
+      "Dating"
+    ],
+    nutrition: [
+      "Antioxidant-rich foods",
+      "Cruciferous vegetables",
+      "Healthy fats",
+      "Light meals"
+    ],
+    exercise: [
+      "Group fitness classes",
+      "Team sports",
+      "HIIT workouts",
+      "Power yoga"
+    ]
+  },
+  luteal: {
+    icon: <Moon className="w-5 h-5 text-purple-500" />,
+    title: "Luteal Phase Insights",
+    description: "Progesterone rises and then drops. You may experience PMS symptoms.",
+    selfCare: [
+      "Journaling",
+      "Stress management",
+      "Extra sleep",
+      "Comfort activities"
+    ],
+    nutrition: [
+      "Complex carbohydrates",
+      "Magnesium-rich foods",
+      "Calcium-rich foods",
+      "Avoid caffeine"
+    ],
+    exercise: [
+      "Pilates",
+      "Low-impact cardio",
+      "Walking",
+      "Restorative yoga"
+    ]
+  }
+};
+
+const PhaseInsightContent = ({ phase }: { phase: keyof typeof phaseInsights }) => {
+  const insight = phaseInsights[phase];
+  return (
+    <div className="space-y-4 p-4 bg-white/50 rounded-lg">
+      <div className="flex items-center gap-2">
+        {insight.icon}
+        <h4 className="font-semibold">{insight.title}</h4>
+      </div>
+      <p className="text-sm text-gray-600">{insight.description}</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <h5 className="font-medium mb-2">Self Care</h5>
+          <ul className="text-sm space-y-1">
+            {insight.selfCare.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h5 className="font-medium mb-2">Nutrition</h5>
+          <ul className="text-sm space-y-1">
+            {insight.nutrition.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h5 className="font-medium mb-2">Exercise</h5>
+          <ul className="text-sm space-y-1">
+            {insight.exercise.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ResultsDialog = ({ open, onOpenChange, results }: ResultsDialogProps) => {
   if (!results) return null;
@@ -34,59 +168,85 @@ const ResultsDialog = ({ open, onOpenChange, results }: ResultsDialogProps) => {
         </DialogHeader>
         <ScrollArea className="h-[calc(100dvh-8rem)] px-6">
           <div className="space-y-4 pb-6">
-            {/* Next Period */}
-            <div className="bg-[#FFE5EC] p-4 rounded-lg">
-              <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                <Info className="w-5 h-5 text-[#FF69B4]" />
-                Next Period
-              </h3>
-              <p className="text-lg mt-2">{format(results.nextPeriod, "MMMM d, yyyy")}</p>
-              <p className="text-sm text-gray-600 mt-1">
-                Your next menstrual cycle is expected to begin on this date. Plan accordingly.
-              </p>
-            </div>
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              {/* Next Period */}
+              <AccordionItem value="period" className="border-0">
+                <div className="bg-[#FFE5EC] rounded-lg">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
+                        <Info className="w-5 h-5 text-[#FF69B4]" />
+                        Next Period
+                      </h3>
+                      <p className="text-lg mt-2">{format(results.nextPeriod, "MMMM d, yyyy")}</p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <PhaseInsightContent phase="menstrual" />
+                  </AccordionContent>
+                </div>
+              </AccordionItem>
 
-            {/* Ovulation Window */}
-            <div className="bg-[#E5DEFF] p-4 rounded-lg">
-              <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                <Info className="w-5 h-5 text-[#9B87F5]" />
-                Ovulation Window
-              </h3>
-              <p className="text-lg mt-2">
-                {format(results.ovulationDay, "MMMM d")} - {format(results.fertileWindowEnd, "MMMM d, yyyy")}
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                This is your estimated ovulation period. Your egg is released during this time, making it the peak fertility window.
-              </p>
-            </div>
+              {/* Ovulation Window */}
+              <AccordionItem value="ovulation" className="border-0">
+                <div className="bg-[#E5DEFF] rounded-lg">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
+                        <Info className="w-5 h-5 text-[#9B87F5]" />
+                        Ovulation Window
+                      </h3>
+                      <p className="text-lg mt-2">
+                        {format(results.ovulationDay, "MMMM d")} - {format(results.fertileWindowEnd, "MMMM d, yyyy")}
+                      </p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <PhaseInsightContent phase="ovulatory" />
+                  </AccordionContent>
+                </div>
+              </AccordionItem>
 
-            {/* Fertile Window */}
-            <div className="bg-[#FDE1D3] p-4 rounded-lg">
-              <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                <Info className="w-5 h-5 text-[#FF8C5A]" />
-                Fertile Window
-              </h3>
-              <p className="text-lg mt-2">
-                {format(results.fertileWindowStart, "MMMM d")} - {format(results.fertileWindowEnd, "MMMM d, yyyy")}
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                During this window, you have the highest chance of conception. The days leading up to and including ovulation are your most fertile days.
-              </p>
-            </div>
+              {/* Fertile Window */}
+              <AccordionItem value="fertile" className="border-0">
+                <div className="bg-[#FDE1D3] rounded-lg">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
+                        <Info className="w-5 h-5 text-[#FF8C5A]" />
+                        Fertile Window
+                      </h3>
+                      <p className="text-lg mt-2">
+                        {format(results.fertileWindowStart, "MMMM d")} - {format(results.fertileWindowEnd, "MMMM d, yyyy")}
+                      </p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <PhaseInsightContent phase="follicular" />
+                  </AccordionContent>
+                </div>
+              </AccordionItem>
 
-            {/* Less Fertile Phase */}
-            <div className="bg-[#D3E4FD] p-4 rounded-lg">
-              <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
-                <Info className="w-5 h-5 text-[#5A9EFF]" />
-                Less Fertile Phase
-              </h3>
-              <p className="text-lg mt-2">
-                {format(results.follicularPhaseStart, "MMMM d")} - {format(results.follicularPhaseEnd, "MMMM d, yyyy")}
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                This is your less fertile phase, occurring after your period and before your fertile window. While pregnancy is still possible, it's less likely during this time.
-              </p>
-            </div>
+              {/* Less Fertile Phase */}
+              <AccordionItem value="lessFertile" className="border-0">
+                <div className="bg-[#D3E4FD] rounded-lg">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-cycle-text flex items-center gap-2">
+                        <Info className="w-5 h-5 text-[#5A9EFF]" />
+                        Less Fertile Phase
+                      </h3>
+                      <p className="text-lg mt-2">
+                        {format(results.follicularPhaseStart, "MMMM d")} - {format(results.follicularPhaseEnd, "MMMM d, yyyy")}
+                      </p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <PhaseInsightContent phase="luteal" />
+                  </AccordionContent>
+                </div>
+              </AccordionItem>
+            </Accordion>
 
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="disclaimer" className="border-b-0">
