@@ -68,6 +68,28 @@ export default {
           accent: "#9b87f5",
           text: "#1A1F2C",
         },
+        phase: {
+          menstrual: {
+            bg: "#FFE5EC",
+            accent: "#FF69B4",
+            text: "#4A1526"
+          },
+          ovulatory: {
+            bg: "#E5DEFF",
+            accent: "#9B87F5",
+            text: "#1A1F2C"
+          },
+          follicular: {
+            bg: "#FDE1D3",
+            accent: "#FF8C5A",
+            text: "#3D2219"
+          },
+          luteal: {
+            bg: "#D3E4FD",
+            accent: "#5A9EFF",
+            text: "#162B47"
+          }
+        }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
