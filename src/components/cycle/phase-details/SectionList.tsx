@@ -1,10 +1,9 @@
-import { Icon } from "lucide-react";
 import * as icons from "lucide-react";
 
 interface SectionListProps {
   title: string;
   items: string[];
-  icon: keyof typeof icons;
+  iconName: keyof typeof icons;
   colors: {
     bg: string;
     accent: string;
@@ -12,8 +11,8 @@ interface SectionListProps {
   };
 }
 
-const SectionList = ({ title, items, icon, colors }: SectionListProps) => {
-  const IconComponent = icons[icon];
+const SectionList = ({ title, items, iconName, colors }: SectionListProps) => {
+  const IconComponent = icons[iconName];
   
   return (
     <div>

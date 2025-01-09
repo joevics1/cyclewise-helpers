@@ -1,8 +1,9 @@
-import { Icon } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import SectionList from "./SectionList";
 
 interface PhaseContentProps {
-  icon: Icon;
+  icon: LucideIcon;  // Changed from Icon to LucideIcon
   description: string;
   symptoms: string[];
   selfCare: string[];
@@ -36,28 +37,28 @@ const PhaseContent = ({
           <SectionList 
             title="Common Symptoms"
             items={symptoms}
-            icon="Thermometer"
+            iconName="Thermometer"
             colors={colors}
           />
           
           <SectionList 
             title="Self-Care Tips"
             items={selfCare}
-            icon="Heart"
+            iconName="Heart"
             colors={colors}
           />
           
           <SectionList 
             title="Nutrition Recommendations"
             items={nutrition}
-            icon="Apple"
+            iconName="Apple"
             colors={colors}
           />
           
           <SectionList 
             title="Exercise Suggestions"
             items={exercise}
-            icon="Dumbbell"
+            iconName="Dumbbell"
             colors={colors}
           />
         </div>

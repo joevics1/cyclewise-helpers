@@ -14,7 +14,8 @@ import {
   Sun, 
   Thermometer,
   Apple,
-  Dumbbell
+  Dumbbell,
+  ChevronLeft
 } from "lucide-react";
 
 interface PhaseInfo {
@@ -173,15 +174,26 @@ const phaseInsights: Record<string, PhaseInfo> = {
 
 interface PhaseInsightsProps {
   phase: string;
+  onBack: () => void;  
 }
 
-const PhaseInsights = ({ phase }: PhaseInsightsProps) => {
+const PhaseInsights = ({ phase, onBack }: PhaseInsightsProps) => {
   const info = phaseInsights[phase];
   if (!info) return null;
 
   return (
     <ScrollArea className="h-full scrollbar-hide">
       <div className={`space-y-6 p-4 ${info.colors.bg}`}>
+        <div className="flex items-center gap-2 mb-4">
+          <ChevronLeft 
+            className={`w-6 h-6 ${info.colors.accent} cursor-pointer`} 
+            onClick={onBack}
+          />
+          <h2 className={`text-xl font-semibold ${info.colors.text}`}>
+            {info.title}
+          </h2>
+        </div>
+        
         <Card className="bg-white/80 backdrop-blur-sm">
           <CardContent className="pt-6">
             <div className="space-y-6">
