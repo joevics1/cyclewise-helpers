@@ -22,6 +22,7 @@ const SymptomLogger = () => {
   const [symptomHistory, setSymptomHistory] = useState<Array<{
     date: string;
     symptoms: string[];
+    timestamp: number;
   }>>([]);
   const [showPregnancyDialog, setShowPregnancyDialog] = useState(false);
   const { toast } = useToast();
@@ -38,41 +39,43 @@ const SymptomLogger = () => {
       const newSymptoms = prev.includes(symptomId)
         ? prev.filter(id => id !== symptomId)
         : [...prev, symptomId];
-      
-      // Auto-log symptoms when toggled
-      const newEntry = {
-        date: format(new Date(), "yyyy-MM-dd"),
-        symptoms: newSymptoms,
-      };
-
-      const updatedHistory = [...symptomHistory];
-      const todayEntryIndex = updatedHistory.findIndex(
-        entry => entry.date === format(new Date(), "yyyy-MM-dd")
-      );
-
-      if (todayEntryIndex >= 0) {
-        updatedHistory[todayEntryIndex] = newEntry;
-      } else {
-        updatedHistory.push(newEntry);
-      }
-
-      setSymptomHistory(updatedHistory);
-      localStorage.setItem("symptomHistory", JSON.stringify(updatedHistory));
-
-      if (checkPregnancySymptoms(newSymptoms)) {
-        setShowPregnancyDialog(true);
-      }
-
       return newSymptoms;
     });
   };
 
-  const checkPregnancySymptoms = (selectedSymptomIds: string[]) => {
+  const logSymptoms = () => {
+    if (selectedSymptoms.length === 0) {
+      toast({
+        title: "No symptoms selected",
+        description: "Please select at least one symptom to log",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const pregnancySymptoms = symptoms.filter(s => s.category === "pregnancy");
-    const selectedPregnancySymptoms = selectedSymptomIds.filter(id => 
+    const selectedPregnancySymptoms = selectedSymptoms.filter(id => 
       symptoms.find(s => s.id === id)?.category === "pregnancy"
     );
-    return (selectedPregnancySymptoms.length / pregnancySymptoms.length) >= 0.7;
+    
+    if ((selectedPregnancySymptoms.length / pregnancySymptoms.length) >= 0.7) {
+      setShowPregnancyDialog(true);
+    }
+
+    const newEntry = {
+      date: format(new Date(), "yyyy-MM-dd"),
+      symptoms: selectedSymptoms,
+      timestamp: Date.now(),
+    };
+
+    setSymptomHistory(prev => [...prev, newEntry]);
+    localStorage.setItem("symptomHistory", JSON.stringify([...symptomHistory, newEntry]));
+    setSelectedSymptoms([]);
+
+    toast({
+      title: "Symptoms logged successfully",
+      description: `${selectedSymptoms.length} symptoms recorded for ${format(new Date(), 'PPP')}`,
+    });
   };
 
   return (
@@ -111,6 +114,13 @@ const SymptomLogger = () => {
               selectedSymptoms={selectedSymptoms}
               onToggleSymptom={toggleSymptom}
             />
+            <Button 
+              onClick={logSymptoms}
+              className="w-full mt-4"
+              variant="default"
+            >
+              Log Symptoms
+            </Button>
           </div>
         </CardContent>
       </Card>

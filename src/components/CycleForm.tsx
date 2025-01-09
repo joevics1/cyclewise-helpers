@@ -7,7 +7,7 @@ import CycleLengthSelector from "./cycle/CycleLengthSelector";
 import ResultsDialog from "./cycle/ResultsDialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bell, CalendarDays } from "lucide-react";
+import { Bell, CalendarDays, ChevronDown, ChevronUp } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -29,6 +29,7 @@ const CycleForm = () => {
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<any>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [showNotificationOptions, setShowNotificationOptions] = useState(false);
   const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>({
     beforePeriod: true,
     onPeriodStart: true,
@@ -179,19 +180,36 @@ const CycleForm = () => {
 
       <CycleLengthSelector cycleLength={cycleLength} setCycleLength={setCycleLength} />
 
-      <div className="space-y-4 bg-[#FFE5EC] p-4 rounded-lg">
-        <div className="flex items-center space-x-2">
-          <Bell className="w-5 h-5 text-[#FF69B4]" />
-          <Label htmlFor="notifications" className="flex-1">Enable notifications</Label>
-          <Switch
-            id="notifications"
-            checked={notificationsEnabled}
-            onCheckedChange={handleNotificationToggle}
-          />
+      <Button 
+        onClick={calculateDates}
+        className="w-full bg-cycle-accent hover:bg-cycle-accent/90 text-white"
+      >
+        {hasStoredData ? 'View Insights' : 'Calculate Cycle'}
+      </Button>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between bg-[#FFE5EC] p-4 rounded-lg cursor-pointer"
+             onClick={() => setShowNotificationOptions(!showNotificationOptions)}>
+          <div className="flex items-center space-x-2">
+            <Bell className="w-5 h-5 text-[#FF69B4]" />
+            <Label htmlFor="notifications" className="flex-1">Notifications</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="notifications"
+              checked={notificationsEnabled}
+              onCheckedChange={handleNotificationToggle}
+              onClick={(e) => e.stopPropagation()}
+            />
+            {showNotificationOptions ? 
+              <ChevronUp className="w-4 h-4" /> : 
+              <ChevronDown className="w-4 h-4" />
+            }
+          </div>
         </div>
 
-        {notificationsEnabled && (
-          <div className="space-y-3 pt-2">
+        {notificationsEnabled && showNotificationOptions && (
+          <div className="space-y-3 bg-[#FFE5EC] p-4 rounded-lg">
             <div className="flex items-center space-x-2">
               <Switch
                 id="beforePeriod"
@@ -245,13 +263,6 @@ const CycleForm = () => {
           </div>
         )}
       </div>
-
-      <Button 
-        onClick={calculateDates}
-        className="w-full bg-cycle-accent hover:bg-cycle-accent/90 text-white"
-      >
-        {hasStoredData ? 'View Insights' : 'Calculate Cycle'}
-      </Button>
 
       <ResultsDialog 
         open={showResults} 
