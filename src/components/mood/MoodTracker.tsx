@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { format, subDays, isSameDay, startOfMonth, endOfMonth } from 'date-fns';
+import { format, subDays, isSameDay } from 'date-fns';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -82,6 +82,20 @@ const MoodTracker = () => {
     )?.mood;
   };
 
+  const groupMoodsByDate = () => {
+    const grouped = moodEntries.reduce((acc, entry) => {
+      const date = format(new Date(entry.date), 'yyyy-MM-dd');
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push(entry);
+      return acc;
+    }, {} as Record<string, typeof moodEntries>);
+
+    return Object.entries(grouped)
+      .sort(([dateA], [dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime());
+  };
+
   const getMoodStats = () => {
     const last7Days = Array.from({ length: 7 }, (_, i) => {
       const date = subDays(new Date(), i);
@@ -97,7 +111,44 @@ const MoodTracker = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="w-full">
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Mood Logs</CardTitle>
+          <CardDescription>Your latest recorded moods</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[300px]">
+            <div className="space-y-4">
+              {groupMoodsByDate().map(([date, entries]) => (
+                <div key={date} className="space-y-2">
+                  <h3 className="font-medium text-sm text-gray-500">
+                    {format(new Date(date), 'PPPP')}
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    {entries.map((entry, index) => {
+                      const mood = moods.find(m => m.label === entry.mood);
+                      const Icon = mood?.icon || Meh;
+                      return (
+                        <div key={index} className={`flex items-center gap-3 p-3 rounded-lg ${mood?.bg}`}>
+                          <Icon className={mood?.color} />
+                          <div>
+                            <p className="font-medium">{entry.mood}</p>
+                            <p className="text-sm text-gray-500">
+                              {format(new Date(entry.date), 'p')}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardHeader>
           <CardTitle>How are you feeling today?</CardTitle>
           <CardDescription>Select your current mood</CardDescription>
@@ -147,34 +198,6 @@ const MoodTracker = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Mood Logs</CardTitle>
-          <CardDescription>Your latest recorded moods</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[200px]">
-            <div className="space-y-4">
-              {moodEntries.slice().reverse().map((entry, index) => {
-                const mood = moods.find(m => m.label === entry.mood);
-                const Icon = mood?.icon || Meh;
-                return (
-                  <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
-                    <Icon className={`h-5 w-5 ${mood?.color}`} />
-                    <div>
-                      <p className="font-medium">{entry.mood}</p>
-                      <p className="text-sm text-gray-500">
-                        {format(new Date(entry.date), 'PPP')}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </ScrollArea>
         </CardContent>
       </Card>
     </div>
