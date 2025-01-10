@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"; // Add this import
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Accordion,
@@ -16,7 +16,6 @@ import {
   Thermometer,
   Apple,
   Dumbbell,
-  ChevronLeft,
   ArrowLeft
 } from "lucide-react";
 
@@ -192,7 +191,7 @@ const PhaseInsights = ({ phase, onBack }: PhaseInsightsProps) => {
           className={`flex items-center gap-2 ${info.colors.accent}`}
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
+          Back
         </Button>
         
         <h2 className={`text-xl font-semibold ${info.colors.text}`}>
