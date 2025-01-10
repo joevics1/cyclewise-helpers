@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Info, ChevronRight, X } from "lucide-react";
+import { Info, ChevronRight, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 import PhaseInsights from "./PhaseInsights";
@@ -46,14 +46,6 @@ const ResultsDialog = ({ open, onOpenChange, results }: ResultsDialogProps) => {
           <DialogTitle className="text-2xl font-bold text-center mb-2">
             Your Cycle Predictions
           </DialogTitle>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="absolute right-2 top-2"
-            onClick={() => onOpenChange(false)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
         </DialogHeader>
         <ScrollArea className="h-[calc(100dvh-8rem)] scrollbar-hide">
           <div className="space-y-3">

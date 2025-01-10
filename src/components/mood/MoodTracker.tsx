@@ -117,18 +117,18 @@ const MoodTracker = () => {
           <CardDescription>Select your current mood</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
             {moods.map(({ icon: Icon, label, color, bg }) => (
               <Button
                 key={label}
                 variant="outline"
-                className={`flex flex-col items-center p-4 h-auto transition-all ${color} ${bg} ${
+                className={`flex flex-col items-center p-2 h-auto transition-all ${color} ${bg} ${
                   getTodaysMood() === label ? 'ring-2 ring-primary' : ''
                 }`}
                 onClick={() => saveMoodEntry(label)}
               >
-                <Icon className={`h-8 w-8`} />
-                <span className="mt-2 text-sm">{label}</span>
+                <Icon className="h-6 w-6" />
+                <span className="mt-1 text-xs">{label}</span>
               </Button>
             ))}
           </div>
@@ -141,23 +141,23 @@ const MoodTracker = () => {
           <CardDescription>Your latest recorded moods</CardDescription>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[300px]">
-            <div className="space-y-4">
+          <ScrollArea className="h-[250px]">
+            <div className="space-y-3">
               {groupMoodsByDate().map(([date, entries]) => (
                 <div key={date} className="space-y-2">
                   <h3 className="font-medium text-sm text-gray-500">
                     {format(new Date(date), 'PPPP')}
                   </h3>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2">
                     {entries.map((entry, index) => {
                       const mood = moods.find(m => m.label === entry.mood);
                       const Icon = mood?.icon || Meh;
                       return (
-                        <div key={index} className={`flex items-center gap-3 p-3 rounded-lg ${mood?.bg}`}>
-                          <Icon className={mood?.color} />
+                        <div key={index} className={`flex items-center gap-2 p-2 rounded-lg ${mood?.bg}`}>
+                          <Icon className={`w-4 h-4 ${mood?.color}`} />
                           <div>
-                            <p className="font-medium">{entry.mood}</p>
-                            <p className="text-sm text-gray-500">
+                            <p className="font-medium text-sm">{entry.mood}</p>
+                            <p className="text-xs text-gray-500">
                               {format(new Date(entry.date), 'p')}
                             </p>
                           </div>
