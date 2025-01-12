@@ -7,7 +7,7 @@ import CycleLengthSelector from "./cycle/CycleLengthSelector";
 import ResultsDialog from "./cycle/ResultsDialog";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bell, CalendarDays, ChevronDown, ChevronUp } from "lucide-react";
+import { Bell, ChevronDown, ChevronUp } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { requestNotificationPermission, onMessageListener } from "@/lib/firebase";
 
 interface NotificationPreferences {
   beforePeriod: boolean;
@@ -95,51 +96,96 @@ const CycleForm = () => {
   };
 
   const scheduleNotifications = async (nextPeriod: Date, ovulationDay: Date) => {
-    if (Notification.permission !== "granted") {
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        toast({
-          title: "Notifications permission denied",
-          description: "Enable notifications in your browser settings to receive alerts",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
+    if (!notificationsEnabled) return;
 
-    // Schedule notification for days before period
-    if (notificationPrefs.beforePeriod) {
-      const daysBefore = subDays(nextPeriod, parseInt(notificationPrefs.reminderDays));
-      if (daysBefore > new Date()) {
-        setTimeout(() => {
-          new Notification("Period Reminder", {
+    try {
+      const token = await requestNotificationPermission();
+      
+      // Send notification scheduling request to your backend
+      const notifications = [];
+      
+      if (notificationPrefs.beforePeriod) {
+        const daysBefore = subDays(nextPeriod, parseInt(notificationPrefs.reminderDays));
+        if (daysBefore > new Date()) {
+          notifications.push({
+            scheduledTime: daysBefore.getTime(),
+            title: "Period Reminder",
             body: `Your period is expected in ${notificationPrefs.reminderDays} days. Prepare accordingly!`,
-            icon: "/favicon.ico"
           });
-        }, daysBefore.getTime() - new Date().getTime());
+        }
       }
-    }
 
-    // Schedule notification for period start
-    if (notificationPrefs.onPeriodStart && nextPeriod > new Date()) {
-      setTimeout(() => {
-        new Notification("Period Start", {
+      if (notificationPrefs.onPeriodStart && nextPeriod > new Date()) {
+        notifications.push({
+          scheduledTime: nextPeriod.getTime(),
+          title: "Period Start",
           body: "Your period starts today. Stay prepared!",
-          icon: "/favicon.ico"
         });
-      }, nextPeriod.getTime() - new Date().getTime());
-    }
+      }
 
-    // Schedule notification for ovulation
-    if (notificationPrefs.ovulation && ovulationDay > new Date()) {
-      setTimeout(() => {
-        new Notification("Ovulation Day", {
+      if (notificationPrefs.ovulation && ovulationDay > new Date()) {
+        notifications.push({
+          scheduledTime: ovulationDay.getTime(),
+          title: "Ovulation Day",
           body: "Your ovulation is expected today. This is your most fertile day.",
-          icon: "/favicon.ico"
         });
-      }, ovulationDay.getTime() - new Date().getTime());
+      }
+
+      // Send notifications to your backend to schedule them
+      if (notifications.length > 0) {
+        // You'll need to implement this endpoint in your backend
+        await fetch('/api/schedule-notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token,
+            notifications,
+          }),
+        });
+      }
+    } catch (error) {
+      console.error('Error scheduling notifications:', error);
+      toast({
+        title: "Failed to schedule notifications",
+        description: "Please try again later",
+        variant: "destructive",
+      });
     }
   };
+
+  useEffect(() => {
+    const setupFirebaseNotifications = async () => {
+      if (notificationsEnabled) {
+        try {
+          const token = await requestNotificationPermission();
+          console.log('FCM Token:', token);
+          
+          // Listen for foreground messages
+          onMessageListener()
+            .then((payload: any) => {
+              toast({
+                title: payload.notification.title,
+                description: payload.notification.body,
+              });
+            })
+            .catch(err => console.log('Failed to receive foreground message:', err));
+            
+        } catch (error) {
+          console.error('Error setting up notifications:', error);
+          setNotificationsEnabled(false);
+          toast({
+            title: "Failed to enable notifications",
+            description: "Please check your browser settings and try again",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    setupFirebaseNotifications();
+  }, [notificationsEnabled, toast]);
 
   const handleNotificationToggle = async (checked: boolean) => {
     if (checked && "Notification" in window) {
