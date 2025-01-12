@@ -14,7 +14,6 @@ const SymptomSection = ({
   category,
   title,
   symptoms,
-  selectedSymptoms,
   onToggleSymptom,
 }: SymptomSectionProps) => {
   return (
@@ -26,8 +25,8 @@ const SymptomSection = ({
           .map((symptom) => (
             <Badge
               key={symptom.id}
-              variant={selectedSymptoms.includes(symptom.id) ? "default" : "outline"}
-              className="cursor-pointer"
+              variant="outline"
+              className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
               onClick={() => onToggleSymptom(symptom.id)}
             >
               {symptom.name}

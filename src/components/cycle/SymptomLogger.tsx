@@ -1,30 +1,61 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { symptoms } from "@/types/symptoms";
 import SymptomSection from "./SymptomSection";
 import SymptomHistory from "./SymptomHistory";
 
+// Symptom remedies mapping
+const symptomRemedies: Record<string, { title: string; remedies: string[] }> = {
+  cramps: {
+    title: "Period Cramps Relief",
+    remedies: [
+      "Apply a heating pad to your lower abdomen",
+      "Try gentle exercise like walking or yoga",
+      "Stay hydrated and avoid caffeine",
+      "Take warm baths",
+      "Practice deep breathing exercises"
+    ]
+  },
+  headache: {
+    title: "Headache Relief",
+    remedies: [
+      "Rest in a quiet, dark room",
+      "Apply cold or warm compress",
+      "Stay hydrated",
+      "Practice neck stretches",
+      "Try aromatherapy with peppermint or lavender"
+    ]
+  },
+  bloating: {
+    title: "Bloating Relief",
+    remedies: [
+      "Avoid salty foods",
+      "Drink peppermint or ginger tea",
+      "Exercise regularly",
+      "Eat smaller meals",
+      "Try probiotics"
+    ]
+  },
+  // Add more remedies for other symptoms...
+};
+
 const SymptomLogger = () => {
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [symptomHistory, setSymptomHistory] = useState<Array<{
     date: string;
     symptoms: string[];
     timestamp: number;
   }>>([]);
-  const [showPregnancyDialog, setShowPregnancyDialog] = useState(false);
+  const [selectedSymptom, setSelectedSymptom] = useState<string | null>(null);
+  const [showRemedyDialog, setShowRemedyDialog] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -34,48 +65,40 @@ const SymptomLogger = () => {
     }
   }, []);
 
-  const toggleSymptom = (symptomId: string) => {
-    setSelectedSymptoms(prev => {
-      const newSymptoms = prev.includes(symptomId)
-        ? prev.filter(id => id !== symptomId)
-        : [...prev, symptomId];
-      return newSymptoms;
-    });
-  };
-
-  const logSymptoms = () => {
-    if (selectedSymptoms.length === 0) {
-      toast({
-        title: "No symptoms selected",
-        description: "Please select at least one symptom to log",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const pregnancySymptoms = symptoms.filter(s => s.category === "pregnancy");
-    const selectedPregnancySymptoms = selectedSymptoms.filter(id => 
-      symptoms.find(s => s.id === id)?.category === "pregnancy"
-    );
+  const logSymptom = (symptomId: string) => {
+    const today = format(new Date(), "yyyy-MM-dd");
+    const symptom = symptoms.find(s => s.id === symptomId);
     
-    if ((selectedPregnancySymptoms.length / pregnancySymptoms.length) >= 0.7) {
-      setShowPregnancyDialog(true);
-    }
-
-    const newEntry = {
-      date: format(new Date(), "yyyy-MM-dd"),
-      symptoms: selectedSymptoms,
-      timestamp: Date.now(),
-    };
-
-    setSymptomHistory(prev => [...prev, newEntry]);
-    localStorage.setItem("symptomHistory", JSON.stringify([...symptomHistory, newEntry]));
-    setSelectedSymptoms([]);
+    setSymptomHistory(prev => {
+      const newHistory = [...prev];
+      const todayEntry = newHistory.find(entry => entry.date === today);
+      
+      if (todayEntry) {
+        if (!todayEntry.symptoms.includes(symptomId)) {
+          todayEntry.symptoms.push(symptomId);
+        }
+      } else {
+        newHistory.push({
+          date: today,
+          symptoms: [symptomId],
+          timestamp: Date.now()
+        });
+      }
+      
+      localStorage.setItem("symptomHistory", JSON.stringify(newHistory));
+      return newHistory;
+    });
 
     toast({
-      title: "Symptoms logged successfully",
-      description: `${selectedSymptoms.length} symptoms recorded for ${format(new Date(), 'PPP')}`,
+      title: "Symptom logged",
+      description: `${symptom?.name} has been recorded for today`,
     });
+
+    // Show remedy dialog if remedies exist for this symptom
+    if (symptomRemedies[symptomId]) {
+      setSelectedSymptom(symptomId);
+      setShowRemedyDialog(true);
+    }
   };
 
   return (
@@ -90,57 +113,56 @@ const SymptomLogger = () => {
               category="physical"
               title="Physical Symptoms"
               symptoms={symptoms}
-              selectedSymptoms={selectedSymptoms}
-              onToggleSymptom={toggleSymptom}
+              selectedSymptoms={[]}
+              onToggleSymptom={logSymptom}
             />
             <SymptomSection
               category="emotional"
               title="Emotional Symptoms"
               symptoms={symptoms}
-              selectedSymptoms={selectedSymptoms}
-              onToggleSymptom={toggleSymptom}
+              selectedSymptoms={[]}
+              onToggleSymptom={logSymptom}
             />
             <SymptomSection
               category="other"
               title="Other Symptoms"
               symptoms={symptoms}
-              selectedSymptoms={selectedSymptoms}
-              onToggleSymptom={toggleSymptom}
+              selectedSymptoms={[]}
+              onToggleSymptom={logSymptom}
             />
             <SymptomSection
               category="pregnancy"
               title="Additional Symptoms"
               symptoms={symptoms}
-              selectedSymptoms={selectedSymptoms}
-              onToggleSymptom={toggleSymptom}
+              selectedSymptoms={[]}
+              onToggleSymptom={logSymptom}
             />
-            <Button 
-              onClick={logSymptoms}
-              className="w-full mt-4"
-              variant="default"
-            >
-              Log Symptoms
-            </Button>
           </div>
         </CardContent>
       </Card>
 
       <SymptomHistory history={symptomHistory} />
 
-      <AlertDialog open={showPregnancyDialog} onOpenChange={setShowPregnancyDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Pregnancy Possibility</AlertDialogTitle>
-            <AlertDialogDescription>
-              You've logged several symptoms that could be associated with pregnancy. While these symptoms can have many causes, you may want to consider taking a pregnancy test or consulting with a healthcare provider.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Dismiss</AlertDialogCancel>
-            <AlertDialogAction>Learn More</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Dialog open={showRemedyDialog} onOpenChange={setShowRemedyDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {selectedSymptom && symptomRemedies[selectedSymptom]?.title}
+            </DialogTitle>
+            <DialogDescription className="space-y-2">
+              {selectedSymptom && symptomRemedies[selectedSymptom]?.remedies.map((remedy, index) => (
+                <p key={index} className="flex items-start gap-2">
+                  <span className="text-sm">•</span>
+                  <span>{remedy}</span>
+                </p>
+              ))}
+              <p className="text-sm text-muted-foreground mt-4">
+                Note: These are general suggestions. Always consult with a healthcare provider for medical advice.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
