@@ -45,7 +45,26 @@ const symptomRemedies: Record<string, { title: string; remedies: string[] }> = {
       "Try probiotics"
     ]
   },
-  // Add more remedies for other symptoms...
+  nausea: {
+    title: "Nausea Relief",
+    remedies: [
+      "Eat small, frequent meals",
+      "Try ginger tea or candies",
+      "Get fresh air",
+      "Practice deep breathing",
+      "Rest in a semi-upright position"
+    ]
+  },
+  fatigue: {
+    title: "Fatigue Management",
+    remedies: [
+      "Take short power naps",
+      "Maintain a regular sleep schedule",
+      "Stay hydrated",
+      "Light exercise like walking",
+      "Eat iron-rich foods"
+    ]
+  }
 };
 
 const SymptomLogger = () => {
@@ -84,6 +103,9 @@ const SymptomLogger = () => {
           timestamp: Date.now()
         });
       }
+      
+      // Sort by date to ensure proper grouping
+      newHistory.sort((a, b) => b.timestamp - a.timestamp);
       
       localStorage.setItem("symptomHistory", JSON.stringify(newHistory));
       return newHistory;

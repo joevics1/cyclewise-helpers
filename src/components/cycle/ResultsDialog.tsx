@@ -4,9 +4,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Info, ChevronRight, ArrowLeft } from "lucide-react";
+import { Info, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 import PhaseInsights from "./PhaseInsights";
@@ -101,7 +100,7 @@ const PhaseCard = ({ title, date, description, phase, onClick }: PhaseCardProps)
     className={`bg-phase-${phase}-bg rounded-lg p-4 cursor-pointer hover:bg-opacity-80 transition-colors`}
   >
     <div className="flex justify-between items-start">
-      <div>
+      <div className="flex-1">
         <h3 className={`font-semibold text-lg text-phase-${phase}-text flex items-center gap-2 mb-1`}>
           <Info className={`w-5 h-5 text-phase-${phase}-accent`} />
           {title}
@@ -113,7 +112,7 @@ const PhaseCard = ({ title, date, description, phase, onClick }: PhaseCardProps)
           {description}
         </p>
       </div>
-      <ChevronRight className={`w-6 h-6 text-phase-${phase}-accent mt-1`} />
+      <ChevronRight className={`w-10 h-10 text-phase-${phase}-accent mt-1`} />
     </div>
   </div>
 );
